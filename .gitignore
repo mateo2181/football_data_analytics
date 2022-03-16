@@ -1,0 +1,7 @@
+.env
+.user.yml
+google_credentials.json
+dbt/
+dask-worker-space/
+
+__pycache__/

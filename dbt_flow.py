@@ -3,7 +3,7 @@ from prefect.tasks.dbt.dbt import DbtShellTask
 import pygit2
 import subprocess
 from clients import LOGGER
-from config import GITHUB_ACCESS_TOKEN, GCP_DBT_DATASET, GCP_BQ_PROJECT, GCP_BQ_LOCATION, GCP_DBT_METHOD, GCP_DBT_KEYFILE
+from config import GCP_DBT_DATASET, GCP_BQ_PROJECT, GCP_BQ_LOCATION, GCP_DBT_METHOD, GCP_DBT_KEYFILE
 @task
 def pull_dbt_repo():
     LOGGER.info(f"Cloning DBT repository from Github...")

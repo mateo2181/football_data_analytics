@@ -28,6 +28,7 @@ dask==2022.2.1
 dbt-bigquery==1.0.0
 dbt-core==1.0.3
 dbt-extractor==0.4.0
+decorator==5.1.1
 defer==1.0.6
 distlib==0.3.4
 distributed==2022.2.1
@@ -40,8 +41,10 @@ filelock==3.6.0
 frozenlist==1.3.0
 fsspec==2022.2.0
 future==0.18.2
+gcsfs==2022.2.0
 google-api-core==2.6.0
 google-auth==2.6.0
+google-auth-oauthlib==0.5.1
 google-cloud-aiplatform==1.11.0
 google-cloud-bigquery==2.34.2
 google-cloud-core==2.2.2

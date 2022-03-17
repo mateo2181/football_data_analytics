@@ -51,7 +51,7 @@ def read_csv_from_s3(bucket: str, key: str) -> pd.DataFrame:
         },
     )
     return df
-
+@task
 def upload_csv_to_gcs(bucket: str, df: pd.DataFrame, key: str):
     logger = prefect.context.get("logger")
     try:
@@ -59,7 +59,7 @@ def upload_csv_to_gcs(bucket: str, df: pd.DataFrame, key: str):
         return True
     except Exception as e:
         logger.error(e)
-        return False
+        return e
 
 @task
 def read_and_upload_to_s3(bucket: str, url: str):
@@ -81,20 +81,23 @@ def read_from_s3_and_upload_to_gcs(AWS_S3_BUCKET, key:str, folderGCS:str, GCS_BU
     logger.info(f"Starting job: uploading csv {fileName}.")
     df = read_csv_from_s3(AWS_S3_BUCKET, key)
     df = transform(df) # Transform column types Dataframe
-    upload_csv_to_gcs(GCS_BUCKET, df, f"{folderGCS}/{fileName}")
-    logger.info(f"Finished job: uploaded csv {fileName}.")
-    return True
+    res = upload_csv_to_gcs.run(GCS_BUCKET, df, f"{folderGCS}/{fileName}")
+    if res:
+        logger.info(f"Finished job: uploaded csv {fileName}.")
+    return res
 
 @task
 def gcs_csv_to_bq_table(gcs_bucket: str, full_table_id: str, remote_csv_path: str) -> Table:
     """
     Insert CSV from Google Storage to BigQuery Table.
 
+    :param gcs_bucket: GCS bucket where files are read from
+    :type gcs_bucket: str
     :param full_table_id: Full ID of a Google BigQuery table.
     :type full_table_id: str
     :param remote_csv_path: Path to uploaded CSV.
     :type remote_csv_path: str
-    :returns: str
+    :returns: Table
     """
     logger = prefect.context.get("logger")
     try:
@@ -107,7 +110,7 @@ def gcs_csv_to_bq_table(gcs_bucket: str, full_table_id: str, remote_csv_path: st
         )
         load_job = gbq.load_table_from_uri(source_uris=gcs_csv_uri, destination=full_table_id, job_config=job_config)
         logger.info(f"Starting job {load_job.job_id}.")
-        logger.success(load_job.result())  # Waits for table load to complete.
+        logger.info(load_job.result())  # Waits for table load to complete.
         return gbq.get_table(full_table_id)
     except BadRequest as e:
         logger.error(f"Invalid GCP request when creating table `{full_table_id}`: {e}")

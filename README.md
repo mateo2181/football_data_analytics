@@ -20,9 +20,26 @@ The origial repository with csv files: https://github.com/ewenme/transfers
 2. Run `$ cp .env.example .env` to create .env file
 3. Set variables in .env file.
 4. Create a python environment (ex: with Anaconda run `$ conda create --name myenv` and activate it with `$ conda activate myenv` ) 
-4. Run `$ pip install -r requirements.txt`
-2. Run `$ docker-compose up`
-3. Run `$ prefect server create-tenant -n default`
-4. Run `$ prefect create project ELT`
-5. Run `$ python register_flows.py`
-6. Run `$ prefect agent local start --label docker`
+5. Run `$ pip install -r requirements.txt`
+6. Run `$ docker-compose up`
+7. Run `$ prefect server create-tenant -n default`
+8. Run `$ prefect create project ELT`
+9. Run `$ python register_flows.py`
+10. Run `$ prefect agent local start --label docker`
+
+
+
+## Architecture diagram
+<img src="images/architecture.png"/>
+
+
+## Technologies
+* Amazon Web Services: S3 Storage 
+* Google Cloud Platform (GCP): Cloud-based auto-scaling platform by Google
+    * Google Cloud Storage (GCS): Data Lake
+    * BigQuery: Data Warehouse
+    * Data Studio: Analytics Visualization
+* Docker: Containerization
+* SQL: Data Analysis & Exploration
+* Prefect: Pipeline Orchestration
+* dbt: Data Transformation

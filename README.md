@@ -16,7 +16,7 @@ The origial repository with csv files: https://github.com/ewenme/transfers
 - S3 bucket created in AWS. 
 
 ## Setup
-1. From IAM in GCP (https://console.cloud.google.com/iam-admin/serviceaccounts) create a new service account, download the credentials file, rename it to "google_credentials.json" and save the file in the root.
+1. From IAM in GCP (https://console.cloud.google.com/iam-admin/serviceaccounts) create a new service account, add a key associated to this account and download the credentials file, rename it to "google_credentials.json" and save the file in the root.
 2. Run `$ cp .env.example .env` to create .env file
 3. Set variables in .env file.
 4. Create a python environment (ex: with Anaconda run `$ conda create --name myenv` and activate it with `$ conda activate myenv` ) 

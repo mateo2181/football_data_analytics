@@ -14,6 +14,7 @@ services:
       PREFECT_API_HEALTH_URL: http://graphql:4201/health
       PREFECT_API_URL: http://graphql:4201/graphql/
       PREFECT_SERVER__TELEMETRY__ENABLED: "true"
+      PREFECT__CONTEXT__SECRETS__GITHUB_ACCESS_TOKEN: "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"
     healthcheck:
       interval: 10s
       retries: 60
@@ -115,6 +116,7 @@ services:
         condition: service_started
     environment:
       PREFECT_SERVER__APOLLO_URL: http://localhost:4200/graphql
+      PREFECT__CONTEXT__SECRETS__GITHUB_ACCESS_TOKEN: "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"
     healthcheck:
       interval: 30s
       retries: 3

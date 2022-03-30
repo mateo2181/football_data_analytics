@@ -1,19 +1,30 @@
-from prefect import task, Flow
-from prefect.tasks.dbt.dbt import DbtShellTask
 import pygit2
 import subprocess
-from clients import LOGGER
-from config import GCP_DBT_DATASET, GCP_BQ_PROJECT, GCP_BQ_LOCATION, GCP_DBT_METHOD, GCP_DBT_KEYFILE
+from config import GCP_DBT_DATASET, GCP_BQ_PROJECT, GCP_BQ_LOCATION, GCP_DBT_METHOD, GCP_DBT_KEYFILE, GITHUB_ACCESS_TOKEN
+import prefect
+from prefect import task, Flow
+from prefect.tasks.dbt.dbt import DbtShellTask
+from prefect.triggers import all_finished
+from prefect.storage import GitHub
+from prefect.run_configs import LocalRun
+
+STORAGE = GitHub(
+    repo="mateo2181/football_data_analytics",
+    path=f"dbt_flow.py",
+    access_token_secret="GITHUB_ACCESS_TOKEN",
+)
+
 @task
 def pull_dbt_repo():
-    LOGGER.info(f"Cloning DBT repository from Github...")
+    logger = prefect.context.get("logger")
+    logger.info(f"Cloning DBT repository from Github...")
     subprocess.run(["rm", "-rf", "dbt"]) # Delete folder on run
     # git_token = GITHUB_ACCESS_TOKEN
     dbt_repo_name = "football_data_dbt"
     # dbt_repo = (f"https://{git_token}:x-oauth-basic@github.com/mateo2181/{dbt_repo_name}")
     dbt_repo = (f"https://github.com/mateo2181/{dbt_repo_name}")
     pygit2.clone_repository(dbt_repo, "dbt")
-    LOGGER.success(f"DTB repository cloned successfully.")
+    logger.info(f"DTB repository cloned successfully.")
 
 
 dbt = DbtShellTask(
@@ -38,12 +49,20 @@ dbt = DbtShellTask(
     }
 )
 
-with Flow("clone_dbt_and_run_models") as flow:
+@task(trigger=all_finished)
+def print_dbt_output(output):
+    logger = prefect.context.get("logger")
+    for line in output:
+        logger.info(line)
+
+
+with Flow("clone_dbt_and_run_models",
+    storage=STORAGE,
+    run_config=LocalRun(labels=["dev"])
+) as flow:
     pull_repo = pull_dbt_repo()
-    res = dbt(
-        command="dbt build",
-        upstream_tasks=[pull_repo],
-    )
+    dbt_run = dbt(command="dbt build", upstream_tasks=[pull_repo])
+    dbt_run_out = print_dbt_output(dbt_run, task_args={"name": "DBT Run Output"})
 
 if __name__ == "__main__":
     state =flow.run()

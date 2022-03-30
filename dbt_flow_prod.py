@@ -1,8 +1,17 @@
+from config import GCP_DBT_DATASET_PROD, GCP_BQ_PROJECT, GCP_BQ_LOCATION, GCP_DBT_METHOD, GCP_DBT_KEYFILE, GITHUB_ACCESS_TOKEN
+import prefect
 from prefect import Flow
 from prefect.tasks.dbt.dbt import DbtShellTask
-from clients import LOGGER
-from config import GCP_DBT_DATASET_PROD, GCP_BQ_PROJECT, GCP_BQ_LOCATION, GCP_DBT_METHOD, GCP_DBT_KEYFILE
 from dbt_flow import pull_dbt_repo
+from dbt_flow import print_dbt_output
+from prefect.storage import GitHub
+from prefect.run_configs import LocalRun
+
+STORAGE = GitHub(
+    repo="mateo2181/football_data_analytics",
+    path=f"dbt_flow_prod.py",
+    access_token_secret=GITHUB_ACCESS_TOKEN,
+)
 
 dbt = DbtShellTask(
     return_all=True,
@@ -26,12 +35,13 @@ dbt = DbtShellTask(
     }
 )
 
-with Flow("DBT PRODUCTION: clone_dbt_and_run_models") as flow:
+with Flow("DBT PRODUCTION: clone_dbt_and_run_models",
+    storage=STORAGE,
+    run_config=LocalRun(labels=["dev"])
+) as flow:
     pull_repo = pull_dbt_repo()
-    res = dbt(
-        command="dbt build -t prod",
-        upstream_tasks=[pull_repo],
-    )
+    dbt_run = dbt(command="dbt build -t prod", upstream_tasks=[pull_repo])
+    dbt_run_out = print_dbt_output(dbt_run, task_args={"name": "DBT PROD Run Output"})
 
 if __name__ == "__main__":
     state =flow.run()

@@ -1,5 +1,5 @@
 import datetime
-from config import AWS_S3_BUCKET, GITHUB_ACCESS_TOKEN
+from config import AWS_S3_BUCKET
 from utils import read_and_upload_to_s3
 from load_flow import leagues, years
 from prefect import task, Flow, Parameter, prefect
@@ -25,7 +25,7 @@ schedule = Schedule(
 STORAGE = GitHub(
     repo="mateo2181/football_data_analytics",
     path=f"extract_flow.py",
-    access_token_secret=GITHUB_ACCESS_TOKEN,
+    access_token_secret="GITHUB_ACCESS_TOKEN",
 )
 
 url = 'https://raw.githubusercontent.com/ewenme/transfers/master/data'

@@ -1,6 +1,6 @@
 import pygit2
 import subprocess
-from config import GCP_DBT_DATASET, GCP_BQ_PROJECT, GCP_BQ_LOCATION, GCP_DBT_METHOD, GCP_DBT_KEYFILE, GITHUB_ACCESS_TOKEN
+from config import GCP_DBT_DATASET, GCP_BQ_PROJECT, GCP_BQ_LOCATION, GCP_DBT_METHOD, GCP_DBT_KEYFILE
 import prefect
 from prefect import task, Flow
 from prefect.tasks.dbt.dbt import DbtShellTask

@@ -8,6 +8,14 @@ import os
 from utils import read_from_s3_and_upload_to_gcs, gcs_csv_to_bq_table
 from prefect import task, Flow
 from config import GCS_BUCKET, GCP_BQ_PROJECT, GCP_BQ_DATASET, GCP_BQ_TABLE_ID, AWS_S3_BUCKET
+from prefect.run_configs import LocalRun
+from prefect.storage import GitHub
+
+STORAGE = GitHub(
+    repo="mateo2181/football_data_analytics",
+    path=f"load_flow.py",
+    access_token_secret="GITHUB_ACCESS_TOKEN",
+)
 
 GCS_FOLDER='transfers'
 
@@ -38,7 +46,10 @@ def move_files_from_s3_to_gcs(urlLeague):
     read_from_s3_and_upload_to_gcs.run(AWS_S3_BUCKET, urlLeague, GCS_FOLDER, GCS_BUCKET)
 
 
-with Flow("load_files_gcs_and_tables_bigquery") as flow:
+with Flow("load_files_gcs_and_tables_bigquery",
+    storage=STORAGE,
+    run_config=LocalRun(labels=["dev"])    
+) as flow:
     urlLeagues = leaguesUrl(years, leagues)
     moveFilesTask = move_files_from_s3_to_gcs.map(urlLeagues)
 

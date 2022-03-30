@@ -25,7 +25,7 @@ The origial repository with csv files: https://github.com/ewenme/transfers
 7. Run `$ prefect server create-tenant -n default`
 8. Run `$ prefect create project ELT`
 9. Run `$ python register_flows.py`
-10. Run `$ prefect agent local start --label docker`
+10. Run `$ prefect agent local start --label dev`
 
 
 

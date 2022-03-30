@@ -1,4 +1,4 @@
-from config import GCP_DBT_DATASET_PROD, GCP_BQ_PROJECT, GCP_BQ_LOCATION, GCP_DBT_METHOD, GCP_DBT_KEYFILE, GITHUB_ACCESS_TOKEN
+from config import GCP_DBT_DATASET_PROD, GCP_BQ_PROJECT, GCP_BQ_LOCATION, GCP_DBT_METHOD, GCP_DBT_KEYFILE
 import prefect
 from prefect import Flow
 from prefect.tasks.dbt.dbt import DbtShellTask
@@ -10,7 +10,7 @@ from prefect.run_configs import LocalRun
 STORAGE = GitHub(
     repo="mateo2181/football_data_analytics",
     path=f"dbt_flow_prod.py",
-    access_token_secret=GITHUB_ACCESS_TOKEN,
+    access_token_secret="GITHUB_ACCESS_TOKEN",
 )
 
 dbt = DbtShellTask(
